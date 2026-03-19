@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Html5Qrcode } from 'html5-qrcode'
-import { AlertCircle, Camera } from 'lucide-react'
+import { AlertCircle, Camera, Loader2 } from 'lucide-react'
 import { useTranslation } from '../contexts/LanguageContext'
 
 export default function BarcodeScanner({ onDetected }) {
