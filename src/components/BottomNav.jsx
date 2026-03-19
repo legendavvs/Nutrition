@@ -12,7 +12,7 @@ export default function BottomNav({ active, onChange }) {
   return (
     <nav className="bg-[#121212] border-t border-[#2a2a2a] safe-bottom shrink-0">
       <div className="flex">
-        {TABS.map(({ key, label, icon: Icon }) => {
+        {TABS.map(({ key, tKey, icon: Icon }) => {
           const isActive = active === key
           return (
             <button
