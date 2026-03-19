@@ -26,8 +26,11 @@ export default async function handler(req, res) {
     const p = data.product
     const nutriments = p.nutriments || {}
 
+    // Шукаємо назву в різних полях, включаючи українську
+    const productName = p.product_name || p.product_name_uk || p.product_name_ru || p.product_name_en || p.generic_name || 'Unknown product'
+
     const result = {
-      name: p.product_name || p.product_name_en || 'Unknown product',
+      name: productName,
       brand: p.brands || '',
       barcode,
       per100g: {
