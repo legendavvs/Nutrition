@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore'
+import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore'
 import { db } from '../firebase'
 import { useAuth } from '../contexts/AuthContext'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Trash2 } from 'lucide-react'
+import EditEntryModal from '../components/EditEntryModal'
 
 function dayStart(d) { const s = new Date(d); s.setHours(0,0,0,0); return s }
 function dayEnd(d)   { const e = new Date(d); e.setHours(23,59,59,999); return e }
@@ -18,6 +19,7 @@ export default function HistoryPage() {
   const { user }          = useAuth()
   const [date, setDate]   = useState(new Date())
   const [entries, setEntries] = useState([])
+  const [editEntry, setEditEntry] = useState(null)
 
   useEffect(() => {
     if (!user) return
@@ -42,6 +44,11 @@ export default function HistoryPage() {
     (acc, e) => ({ cals: acc.cals + e.cals, p: acc.p + e.p, f: acc.f + e.f, c: acc.c + e.c }),
     { cals: 0, p: 0, f: 0, c: 0 }
   )
+
+  async function removeEntry(id) {
+    if (!user) return
+    await deleteDoc(doc(db, 'logs', user.uid, 'entries', id))
+  }
 
   const isToday = date.toDateString() === new Date().toDateString()
 
@@ -91,22 +98,35 @@ export default function HistoryPage() {
         ) : (
           <div className="space-y-2">
             {entries.map(e => (
-              <div key={e.id} className="bg-[#121212] border border-[#2a2a2a] rounded-xl p-3.5 flex items-center gap-3 animate-fade-in">
+              <div key={e.id} onClick={() => setEditEntry(e)} className="bg-[#121212] border border-[#2a2a2a] rounded-xl p-3.5 flex items-center gap-3 cursor-pointer hover:bg-[#1a1a1a] transition-colors animate-fade-in">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-white truncate">{e.name}</p>
                   <p className="text-xs text-gray-500">{e.weight}g · {new Date(e.timestamp?.toDate?.() || e.timestamp).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' })}</p>
                 </div>
-                <div className="flex gap-2.5 text-xs shrink-0">
+                <div className="flex gap-2.5 text-xs shrink-0 items-center">
                   <span className="text-orange-400 font-semibold">{Math.round(e.cals)}<span className="text-gray-600"> kcal</span></span>
-                  <span className="text-blue-400">{Math.round(e.p * 10)/10}<span className="text-gray-600">p</span></span>
-                  <span className="text-yellow-400">{Math.round(e.f * 10)/10}<span className="text-gray-600">f</span></span>
-                  <span className="text-purple-400">{Math.round(e.c * 10)/10}<span className="text-gray-600">c</span></span>
+                  <span className="text-blue-400">{Math.round(e.p * 10)/10}p</span>
+                  <span className="text-yellow-400">{Math.round(e.f * 10)/10}f</span>
+                  <span className="text-purple-400">{Math.round(e.c * 10)/10}c</span>
+                  <button
+                    onClick={(ev) => { ev.stopPropagation(); removeEntry(e.id) }}
+                    className="text-gray-600 hover:text-red-400 transition-colors ml-1 shrink-0"
+                  >
+                    <Trash2 size={14} />
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+      {editEntry && (
+        <EditEntryModal
+          entry={editEntry}
+          onClose={() => setEditEntry(null)}
+          onDelete={() => { removeEntry(editEntry.id); setEditEntry(null) }}
+        />
+      )}
     </div>
   )
 }

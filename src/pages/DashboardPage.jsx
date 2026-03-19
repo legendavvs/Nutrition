@@ -4,6 +4,7 @@ import { db } from '../firebase'
 import { useAuth } from '../contexts/AuthContext'
 import { Plus, Trash2, Flame, Beef, Droplets, Wheat } from 'lucide-react'
 import AddFoodModal from '../components/AddFoodModal'
+import EditEntryModal from '../components/EditEntryModal'
 
 function CircleProgress({ value, max, label, color, unit = '' }) {
   const pct    = Math.min(value / (max || 1), 1)
@@ -69,6 +70,7 @@ export default function DashboardPage({ goals }) {
   const { user }        = useAuth()
   const [entries, setEntries] = useState([])
   const [showAdd, setShowAdd] = useState(false)
+  const [editEntry, setEditEntry] = useState(null)
 
   useEffect(() => {
     if (!user) return
@@ -141,7 +143,7 @@ export default function DashboardPage({ goals }) {
           ) : (
             <div className="space-y-2">
               {entries.map(e => (
-                <div key={e.id} className="bg-[#121212] border border-[#2a2a2a] rounded-xl p-3.5 flex items-center gap-3 animate-fade-in">
+                <div key={e.id} onClick={() => setEditEntry(e)} className="bg-[#121212] border border-[#2a2a2a] rounded-xl p-3.5 flex items-center gap-3 cursor-pointer hover:bg-[#1a1a1a] transition-colors animate-fade-in">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-white truncate">{e.name}</p>
                     <p className="text-xs text-gray-500">{e.weight}g</p>
@@ -153,7 +155,7 @@ export default function DashboardPage({ goals }) {
                     <span className="text-purple-400">{Math.round(e.c * 10)/10}<span className="text-gray-600">c</span></span>
                   </div>
                   <button
-                    onClick={() => removeEntry(e.id)}
+                    onClick={(ev) => { ev.stopPropagation(); removeEntry(e.id) }}
                     className="text-gray-600 hover:text-red-400 transition-colors ml-1 shrink-0"
                   >
                     <Trash2 size={14} />
@@ -174,6 +176,13 @@ export default function DashboardPage({ goals }) {
       </button>
 
       {showAdd && <AddFoodModal goals={goals} onClose={() => setShowAdd(false)} />}
+      {editEntry && (
+        <EditEntryModal
+          entry={editEntry}
+          onClose={() => setEditEntry(null)}
+          onDelete={() => { removeEntry(editEntry.id); setEditEntry(null) }}
+        />
+      )}
     </div>
   )
 }
