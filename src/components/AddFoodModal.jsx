@@ -11,10 +11,10 @@ function calcMacros(per100, weight) {
   const w = parseFloat(weight) || 0
   const ratio = w / 100
   return {
-    cals: Math.round(per100.cals * ratio),
-    p:    Math.round(per100.p * ratio * 10) / 10,
-    f:    Math.round(per100.f * ratio * 10) / 10,
-    c:    Math.round(per100.c * ratio * 10) / 10,
+    cals: Math.round((parseFloat(per100.cals) || 0) * ratio),
+    p:    Math.round((parseFloat(per100.p) || 0) * ratio * 10) / 10,
+    f:    Math.round((parseFloat(per100.f) || 0) * ratio * 10) / 10,
+    c:    Math.round((parseFloat(per100.c) || 0) * ratio * 10) / 10,
   }
 }
 
@@ -147,21 +147,32 @@ export default function AddFoodModal({ onClose }) {
 
               {scanned && !fetching && (
                 <div className="animate-fade-in">
-                  {/* Product card */}
+                  {/* Product card (Editable) */}
                   <div className="bg-black border border-[#2a2a2a] rounded-xl p-4 mb-4">
-                    <h4 className="text-base font-semibold text-white mb-0.5">{scanned.name}</h4>
+                    <input
+                      value={scanned.name}
+                      onChange={e => setScanned(s => ({ ...s, name: e.target.value }))}
+                      className="w-full bg-transparent text-base font-semibold text-white mb-0.5 border-b border-dashed border-[#2a2a2a] focus:border-emerald-500 focus:outline-none"
+                    />
                     {scanned.brand && <p className="text-xs text-gray-500 mb-3">{scanned.brand}</p>}
-                    <div className="flex gap-3 text-xs text-center">
+                    <div className="grid grid-cols-5 gap-1.5 text-xs text-center mt-3 items-end">
+                      <div className="pb-1.5 text-left"><span className="text-gray-500">per 100g</span></div>
                       {[
-                        { l: 'per 100g', v: '—', c: 'text-gray-400' },
-                        { l: 'Kcal', v: scanned.per100g.cals, c: 'text-orange-400' },
-                        { l: 'P', v: `${scanned.per100g.p}g`, c: 'text-blue-400' },
-                        { l: 'F', v: `${scanned.per100g.f}g`, c: 'text-yellow-400' },
-                        { l: 'C', v: `${scanned.per100g.c}g`, c: 'text-purple-400' },
+                        { key: 'cals', l: 'Kcal', c: 'text-orange-400' },
+                        { key: 'p', l: 'P(g)', c: 'text-blue-400' },
+                        { key: 'f', l: 'F(g)', c: 'text-yellow-400' },
+                        { key: 'c', l: 'C(g)', c: 'text-purple-400' },
                       ].map(x => (
-                        <div key={x.l} className="flex-1">
-                          <p className={`font-semibold ${x.c}`}>{x.v}</p>
-                          <p className="text-gray-600">{x.l}</p>
+                        <div key={x.key} className="flex flex-col items-center">
+                          <input
+                            type="number" min="0" step="any"
+                            value={scanned.per100g[x.key]}
+                            onChange={e => setScanned(s => ({
+                              ...s, per100g: { ...s.per100g, [x.key]: e.target.value }
+                            }))}
+                            className={`w-full text-center bg-[#121212] border border-[#2a2a2a] rounded-md py-1.5 font-semibold ${x.c} focus:outline-none focus:border-emerald-500`}
+                          />
+                          <span className="text-gray-600 mt-1">{x.l}</span>
                         </div>
                       ))}
                     </div>
