@@ -7,8 +7,9 @@ export default async function handler(req, res) {
   }
 
   try {
+    const searchUrl = `https://world.openfoodfacts.org/cgi/search.pl?action=process&tagtype_0=search_terms&tag_contains_0=contains&tag_0=${encodeURIComponent(q)}&sort_by=unique_scans_n&page_size=40&json=1`
     const response = await fetch(
-      `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=30`,
+      searchUrl,
       {
         headers: { 'User-Agent': 'NutriScan/1.0 (contact@nutriscan.app)' }
       }
