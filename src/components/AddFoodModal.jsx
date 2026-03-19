@@ -4,6 +4,7 @@ import { db } from '../firebase'
 import { useAuth } from '../contexts/AuthContext'
 import { X, Loader2, ScanLine, PenLine, Search, AlertCircle } from 'lucide-react'
 import BarcodeScanner from './BarcodeScanner'
+import { useTranslation } from '../contexts/LanguageContext'
 
 const EMPTY_MANUAL = { name: '', cals: '', p: '', f: '', c: '', weight: '100' }
 
@@ -19,6 +20,7 @@ function calcMacros(per100, weight) {
 }
 
 export default function AddFoodModal({ onClose }) {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [tab, setTab]             = useState('scan')      // 'scan' | 'manual'
   const [scanned, setScanned]     = useState(null)        // product from API
@@ -91,7 +93,7 @@ export default function AddFoodModal({ onClose }) {
 
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3">
-          <h3 className="text-base font-semibold text-white">Add Food</h3>
+          <h3 className="text-base font-semibold text-white">{t('mod.add.title')}</h3>
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#2a2a2a] transition-colors">
             <X size={18} className="text-gray-400" />
           </button>
@@ -101,17 +103,17 @@ export default function AddFoodModal({ onClose }) {
         <div className="px-4 mb-4">
           <div className="flex rounded-xl overflow-hidden border border-[#2a2a2a]">
             {[
-              { key: 'scan',   icon: <ScanLine size={14}/>,  label: 'Scanner' },
-              { key: 'manual', icon: <PenLine size={14}/>,   label: 'Manual'  },
-            ].map(t => (
+              { key: 'scan',   icon: <ScanLine size={14}/>,  label: t('mod.scan') },
+              { key: 'manual', icon: <PenLine size={14}/>,   label: t('mod.manual')  },
+            ].map(tabItem => (
               <button
-                key={t.key}
-                onClick={() => { setTab(t.key); setScanned(null); setScanDone(false); setFetchError('') }}
+                key={tabItem.key}
+                onClick={() => { setTab(tabItem.key); setScanned(null); setScanDone(false); setFetchError('') }}
                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors ${
-                  tab === t.key ? 'bg-emerald-500 text-black' : 'text-gray-400 hover:text-white'
+                  tab === tabItem.key ? 'bg-emerald-500 text-black' : 'text-gray-400 hover:text-white'
                 }`}
               >
-                {t.icon}{t.label}
+                {tabItem.icon}{tabItem.label}
               </button>
             ))}
           </div>
@@ -128,7 +130,7 @@ export default function AddFoodModal({ onClose }) {
               {fetching && (
                 <div className="flex flex-col items-center gap-3 py-8">
                   <Loader2 size={28} className="animate-spin text-emerald-400" />
-                  <p className="text-sm text-gray-400">Looking up product…</p>
+                  <p className="text-sm text-gray-400">{t('mod.look')}</p>
                 </div>
               )}
 
@@ -140,7 +142,7 @@ export default function AddFoodModal({ onClose }) {
                     onClick={() => { setScanDone(false); setFetchError('') }}
                     className="text-emerald-400 text-sm underline"
                   >
-                    Try again
+                    {t('mod.try')}
                   </button>
                 </div>
               )}
@@ -156,7 +158,7 @@ export default function AddFoodModal({ onClose }) {
                     />
                     {scanned.brand && <p className="text-xs text-gray-500 mb-3">{scanned.brand}</p>}
                     <div className="grid grid-cols-5 gap-1.5 text-xs text-center mt-3 items-end">
-                      <div className="pb-1.5 text-left"><span className="text-gray-500">per 100g</span></div>
+                      <div className="pb-1.5 text-left"><span className="text-gray-500">{t('mod.per100')}</span></div>
                       {[
                         { key: 'cals', l: 'Kcal', c: 'text-orange-400' },
                         { key: 'p', l: 'P(g)', c: 'text-blue-400' },
@@ -179,7 +181,7 @@ export default function AddFoodModal({ onClose }) {
                   </div>
 
                   {/* Weight input */}
-                  <label className="text-xs text-gray-400 mb-1 block">Portion weight (grams)</label>
+                  <label className="text-xs text-gray-400 mb-1 block">{t('mod.weight')}</label>
                   <input
                     type="number" min="1" max="5000"
                     value={weight}
@@ -210,7 +212,7 @@ export default function AddFoodModal({ onClose }) {
                     className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-black font-semibold rounded-xl py-3.5 text-sm transition-colors flex items-center justify-center gap-2"
                   >
                     {saving && <Loader2 size={15} className="animate-spin" />}
-                    Add to Today
+                    {t('mod.addbtn')}
                   </button>
                 </div>
               )}
@@ -221,9 +223,9 @@ export default function AddFoodModal({ onClose }) {
           {tab === 'manual' && (
             <form onSubmit={handleSaveManual} className="space-y-3 animate-fade-in">
               <div>
-                <label className="text-xs text-gray-400 mb-1 block">Product name</label>
+                <label className="text-xs text-gray-400 mb-1 block">{t('mod.name')}</label>
                 <input
-                  required placeholder="e.g. Chicken breast"
+                  required placeholder={t('mod.name.ph')}
                   value={manual.name}
                   onChange={e => setManual(m => ({ ...m, name: e.target.value }))}
                   className="w-full bg-black border border-[#2a2a2a] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors"
@@ -232,11 +234,11 @@ export default function AddFoodModal({ onClose }) {
 
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { key: 'cals', label: 'Calories', unit: 'kcal', color: 'text-orange-400' },
-                  { key: 'weight', label: 'Weight',  unit: 'g',   color: 'text-gray-300' },
-                  { key: 'p',    label: 'Protein',   unit: 'g',   color: 'text-blue-400' },
-                  { key: 'f',    label: 'Fat',        unit: 'g',   color: 'text-yellow-400' },
-                  { key: 'c',    label: 'Carbs',      unit: 'g',   color: 'text-purple-400' },
+                  { key: 'cals', label: t('dash.cals'), unit: 'kcal', color: 'text-orange-400' },
+                  { key: 'weight', label: t('mod.t.weight'),  unit: 'g',   color: 'text-gray-300' },
+                  { key: 'p',    label: t('dash.p'),   unit: 'g',   color: 'text-blue-400' },
+                  { key: 'f',    label: t('dash.f'),        unit: 'g',   color: 'text-yellow-400' },
+                  { key: 'c',    label: t('dash.c'),      unit: 'g',   color: 'text-purple-400' },
                 ].map(f => (
                   <div key={f.key} className={f.key === 'cals' ? 'col-span-2' : ''}>
                     <label className={`text-xs mb-1 block ${f.color}`}>{f.label} <span className="text-gray-600">({f.unit})</span></label>
@@ -257,7 +259,7 @@ export default function AddFoodModal({ onClose }) {
                 className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-black font-semibold rounded-xl py-3.5 text-sm transition-colors flex items-center justify-center gap-2"
               >
                 {saving && <Loader2 size={15} className="animate-spin" />}
-                Add to Today
+                {t('mod.addbtn')}
               </button>
             </form>
           )}

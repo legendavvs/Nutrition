@@ -4,18 +4,20 @@ import { db } from '../firebase'
 import { useAuth } from '../contexts/AuthContext'
 import { ChevronLeft, ChevronRight, Trash2 } from 'lucide-react'
 import EditEntryModal from '../components/EditEntryModal'
+import { useTranslation } from '../contexts/LanguageContext'
 
 function dayStart(d) { const s = new Date(d); s.setHours(0,0,0,0); return s }
 function dayEnd(d)   { const e = new Date(d); e.setHours(23,59,59,999); return e }
-function fmtDate(d)  {
+function fmtDate(d, t, lang)  {
   const today = new Date()
   const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1)
-  if (d.toDateString() === today.toDateString()) return 'Today'
-  if (d.toDateString() === yesterday.toDateString()) return 'Yesterday'
-  return d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' })
+  if (d.toDateString() === today.toDateString()) return t('hist.today')
+  if (d.toDateString() === yesterday.toDateString()) return t('hist.yesterday')
+  return d.toLocaleDateString(lang === 'uk' ? 'uk-UA' : 'en-US', { weekday:'short', month:'short', day:'numeric' })
 }
 
 export default function HistoryPage() {
+  const { t, lang }       = useTranslation()
   const { user }          = useAuth()
   const [date, setDate]   = useState(new Date())
   const [entries, setEntries] = useState([])
@@ -55,14 +57,14 @@ export default function HistoryPage() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-6">
-        <h2 className="text-xl font-bold text-white mb-4">History</h2>
+        <h2 className="text-xl font-bold text-white mb-4">{t('hist.title')}</h2>
 
         {/* Date Nav */}
         <div className="flex items-center justify-between bg-[#121212] border border-[#2a2a2a] rounded-2xl p-3 mb-4">
           <button onClick={goBack} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[#2a2a2a] transition-colors">
             <ChevronLeft size={18} className="text-gray-400" />
           </button>
-          <span className="text-sm font-medium text-white">{fmtDate(date)}</span>
+          <span className="text-sm font-medium text-white">{fmtDate(date, t, lang)}</span>
           <button
             onClick={goForward}
             disabled={isToday}
@@ -76,10 +78,10 @@ export default function HistoryPage() {
         {entries.length > 0 && (
           <div className="grid grid-cols-4 gap-2 mb-4">
             {[
-              { label: 'Kcal', val: Math.round(totals.cals),           color: 'text-orange-400' },
-              { label: 'Protein', val: `${Math.round(totals.p)}g`,     color: 'text-blue-400' },
-              { label: 'Fat',    val: `${Math.round(totals.f)}g`,       color: 'text-yellow-400' },
-              { label: 'Carbs',  val: `${Math.round(totals.c)}g`,       color: 'text-purple-400' },
+              { label: t('dash.cals'), val: Math.round(totals.cals),           color: 'text-orange-400' },
+              { label: t('dash.p'), val: `${Math.round(totals.p)}g`,     color: 'text-blue-400' },
+              { label: t('dash.f'),    val: `${Math.round(totals.f)}g`,       color: 'text-yellow-400' },
+              { label: t('dash.c'),  val: `${Math.round(totals.c)}g`,       color: 'text-purple-400' },
             ].map(item => (
               <div key={item.label} className="bg-[#121212] border border-[#2a2a2a] rounded-xl p-2.5 text-center">
                 <p className={`text-base font-bold ${item.color}`}>{item.val}</p>
@@ -93,7 +95,7 @@ export default function HistoryPage() {
         {entries.length === 0 ? (
           <div className="text-center py-16 text-gray-600 text-sm">
             <p className="text-3xl mb-2">📅</p>
-            <p>No entries for this day.</p>
+            <p>{t('hist.empty')}</p>
           </div>
         ) : (
           <div className="space-y-2">

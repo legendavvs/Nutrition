@@ -3,8 +3,10 @@ import { doc, updateDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 import { useAuth } from '../contexts/AuthContext'
 import { X, Loader2, Save, Trash2 } from 'lucide-react'
+import { useTranslation } from '../contexts/LanguageContext'
 
 export default function EditEntryModal({ entry, onClose, onDelete }) {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [saving, setSaving] = useState(false)
   
@@ -40,7 +42,7 @@ export default function EditEntryModal({ entry, onClose, onDelete }) {
           <div className="w-10 h-1 bg-[#3a3a3a] rounded-full" />
         </div>
         <div className="flex items-center justify-between px-4 py-3">
-          <h3 className="text-base font-semibold text-white">Edit Logged Entry</h3>
+          <h3 className="text-base font-semibold text-white">{t('mod.edit.title')}</h3>
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#2a2a2a] transition-colors">
             <X size={18} className="text-gray-400" />
           </button>
@@ -48,7 +50,7 @@ export default function EditEntryModal({ entry, onClose, onDelete }) {
         <div className="px-4 pb-8">
           <form onSubmit={handleSave} className="space-y-3">
             <div>
-              <label className="text-xs text-gray-400 mb-1 block">Product name</label>
+              <label className="text-xs text-gray-400 mb-1 block">{t('mod.name')}</label>
               <input
                 required
                 value={data.name}
@@ -58,11 +60,11 @@ export default function EditEntryModal({ entry, onClose, onDelete }) {
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { key: 'cals', label: 'Total Calories', unit: 'kcal', color: 'text-orange-400' },
-                { key: 'weight', label: 'Portion Weight',  unit: 'g',   color: 'text-gray-300' },
-                { key: 'p',    label: 'Total Protein',   unit: 'g',   color: 'text-blue-400' },
-                { key: 'f',    label: 'Total Fat',        unit: 'g',   color: 'text-yellow-400' },
-                { key: 'c',    label: 'Total Carbs',      unit: 'g',   color: 'text-purple-400' },
+                { key: 'cals', label: t('mod.t.kcal'), unit: 'kcal', color: 'text-orange-400' },
+                { key: 'weight', label: t('mod.t.weight'),  unit: 'g',   color: 'text-gray-300' },
+                { key: 'p',    label: t('mod.t.p'),   unit: 'g',   color: 'text-blue-400' },
+                { key: 'f',    label: t('mod.t.f'),        unit: 'g',   color: 'text-yellow-400' },
+                { key: 'c',    label: t('mod.t.c'),      unit: 'g',   color: 'text-purple-400' },
               ].map(f => (
                 <div key={f.key} className={f.key === 'cals' ? 'col-span-2' : ''}>
                   <label className={`text-xs mb-1 block ${f.color}`}>{f.label} <span className="text-gray-600">({f.unit})</span></label>
@@ -91,7 +93,7 @@ export default function EditEntryModal({ entry, onClose, onDelete }) {
                 className="flex-1 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-black font-semibold rounded-xl py-3.5 text-sm transition-colors flex items-center justify-center gap-2"
               >
                 {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
-                Save Changes
+                {t('mod.savebtn')}
               </button>
             </div>
           </form>

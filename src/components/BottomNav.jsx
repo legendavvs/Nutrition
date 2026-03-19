@@ -1,12 +1,14 @@
 import { LayoutDashboard, History, Settings } from 'lucide-react'
+import { useTranslation } from '../contexts/LanguageContext'
 
 const TABS = [
-  { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { key: 'history',   label: 'History',   icon: History },
-  { key: 'settings',  label: 'Settings',  icon: Settings },
+  { key: 'dashboard', tKey: 'nav.dashboard', icon: LayoutDashboard },
+  { key: 'history',   tKey: 'nav.history',   icon: History },
+  { key: 'settings',  tKey: 'nav.settings',  icon: Settings },
 ]
 
 export default function BottomNav({ active, onChange }) {
+  const { t } = useTranslation()
   return (
     <nav className="bg-[#121212] border-t border-[#2a2a2a] safe-bottom shrink-0">
       <div className="flex">
@@ -21,7 +23,7 @@ export default function BottomNav({ active, onChange }) {
               }`}
             >
               <Icon size={22} strokeWidth={isActive ? 2.5 : 1.8} />
-              <span className="text-[10px] font-medium">{label}</span>
+              <span className="text-[10px] font-medium">{t(tKey)}</span>
             </button>
           )
         })}

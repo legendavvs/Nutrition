@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Html5Qrcode } from 'html5-qrcode'
-import { Loader2, AlertCircle } from 'lucide-react'
+import { AlertCircle, Camera } from 'lucide-react'
+import { useTranslation } from '../contexts/LanguageContext'
 
 export default function BarcodeScanner({ onDetected }) {
+  const { t } = useTranslation()
   const [error, setError]   = useState('')
   const [starting, setStarting] = useState(true)
   const containerRef = useRef(null)
@@ -19,8 +21,7 @@ export default function BarcodeScanner({ onDetected }) {
 
         const cameras = await Html5Qrcode.getCameras()
         if (!cameras || cameras.length === 0) {
-          setError('No camera found on this device.')
-          setStarting(false)
+          setError(t('scan.err.cam'))
           return
         }
 
@@ -37,9 +38,8 @@ export default function BarcodeScanner({ onDetected }) {
         )
         setStarting(false)
       } catch (err) {
-        console.error('[Scanner]', err)
-        setError(err?.message || 'Failed to start camera. Please allow camera access.')
-        setStarting(false)
+        setError(t('scan.err.fail'))
+        console.error(err)
       }
     }
 

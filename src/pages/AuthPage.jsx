@@ -6,8 +6,10 @@ import {
 import { doc, setDoc } from 'firebase/firestore'
 import { auth, db } from '../firebase'
 import { Leaf, Mail, Lock, Loader2 } from 'lucide-react'
+import { useTranslation } from '../contexts/LanguageContext'
 
 export default function AuthPage() {
+  const { t } = useTranslation()
   const [mode, setMode]       = useState('login')  // 'login' | 'register'
   const [email, setEmail]     = useState('')
   const [password, setPassword] = useState('')
@@ -50,7 +52,7 @@ export default function AuthPage() {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">NutriScan</h1>
-          <p className="text-xs text-gray-500">Calorie & Macro Tracker</p>
+          <p className="text-xs text-gray-500">{t('auth.title')}</p>
         </div>
       </div>
 
@@ -58,17 +60,17 @@ export default function AuthPage() {
       <div className="w-full max-w-sm bg-[#121212] border border-[#2a2a2a] rounded-2xl p-6">
         {/* Tabs */}
         <div className="flex rounded-xl overflow-hidden border border-[#2a2a2a] mb-6">
-          {['login','register'].map(t => (
+          {['login','register'].map(tab => (
             <button
-              key={t}
-              onClick={() => { setMode(t); setError('') }}
+              key={tab}
+              onClick={() => { setMode(tab); setError('') }}
               className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-                mode === t
+                mode === tab
                   ? 'bg-emerald-500 text-black'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              {t === 'login' ? 'Sign In' : 'Sign Up'}
+              {tab === 'login' ? t('auth.signin') : t('auth.signup')}
             </button>
           ))}
         </div>
@@ -79,7 +81,7 @@ export default function AuthPage() {
             <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
             <input
               type="email"
-              placeholder="Email"
+              placeholder={t('auth.email')}
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
@@ -92,7 +94,7 @@ export default function AuthPage() {
             <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
             <input
               type="password"
-              placeholder={mode === 'register' ? 'Password (min 6 chars)' : 'Password'}
+              placeholder={mode === 'register' ? t('auth.password_min') : t('auth.password')}
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
@@ -112,12 +114,12 @@ export default function AuthPage() {
             className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-black font-semibold rounded-xl py-3 text-sm transition-colors flex items-center justify-center gap-2"
           >
             {loading && <Loader2 size={15} className="animate-spin" />}
-            {mode === 'login' ? 'Sign In' : 'Create Account'}
+            {mode === 'login' ? t('auth.signin') : t('auth.create')}
           </button>
         </form>
       </div>
 
-      <p className="text-gray-600 text-xs mt-6">Track your nutrition, every day.</p>
+      <p className="text-gray-600 text-xs mt-6">{t('auth.tagline')}</p>
     </div>
   )
 }

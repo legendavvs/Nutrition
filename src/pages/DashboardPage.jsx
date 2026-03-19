@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { Plus, Trash2, Flame, Beef, Droplets, Wheat } from 'lucide-react'
 import AddFoodModal from '../components/AddFoodModal'
 import EditEntryModal from '../components/EditEntryModal'
+import { useTranslation } from '../contexts/LanguageContext'
 
 function CircleProgress({ value, max, label, color, unit = '' }) {
   const pct    = Math.min(value / (max || 1), 1)
@@ -34,6 +35,7 @@ function CircleProgress({ value, max, label, color, unit = '' }) {
 }
 
 function CalorieBar({ consumed, goal }) {
+  const { t } = useTranslation()
   const pct = Math.min(consumed / (goal || 1), 1)
   const over = consumed > goal
 
@@ -42,7 +44,7 @@ function CalorieBar({ consumed, goal }) {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Flame size={16} className="text-orange-400" />
-          <span className="text-sm font-medium text-white">Calories</span>
+          <span className="text-sm font-medium text-white">{t('dash.cals')}</span>
         </div>
         <div className="text-right">
           <span className={`text-lg font-bold ${over ? 'text-red-400' : 'text-white'}`}>{consumed}</span>
@@ -55,7 +57,7 @@ function CalorieBar({ consumed, goal }) {
           style={{ width: `${pct * 100}%` }}
         />
       </div>
-      <p className="text-xs text-gray-500 mt-1.5">{Math.max(0, goal - consumed)} kcal remaining</p>
+      <p className="text-xs text-gray-500 mt-1.5">{Math.max(0, goal - consumed)} {t('dash.rem')}</p>
     </div>
   )
 }
@@ -67,6 +69,7 @@ function todayRange() {
 }
 
 export default function DashboardPage({ goals }) {
+  const { t } = useTranslation()
   const { user }        = useAuth()
   const [entries, setEntries] = useState([])
   const [showAdd, setShowAdd] = useState(false)
@@ -97,9 +100,9 @@ export default function DashboardPage({ goals }) {
   }
 
   const macros = [
-    { key: 'p', label: 'Protein', color: '#3b82f6', icon: <Beef size={12}/> },
-    { key: 'f', label: 'Fat',     color: '#f59e0b', icon: <Droplets size={12}/> },
-    { key: 'c', label: 'Carbs',   color: '#a855f7', icon: <Wheat size={12}/> },
+    { key: 'p', label: t('dash.p'), color: '#3b82f6', icon: <Beef size={12}/> },
+    { key: 'f', label: t('dash.f'), color: '#f59e0b', icon: <Droplets size={12}/> },
+    { key: 'c', label: t('dash.c'), color: '#a855f7', icon: <Wheat size={12}/> },
   ]
 
   return (
@@ -107,7 +110,7 @@ export default function DashboardPage({ goals }) {
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-6">
         {/* Header */}
         <div className="mb-5">
-          <h2 className="text-xl font-bold text-white">Today</h2>
+          <h2 className="text-xl font-bold text-white">{t('dash.today')}</h2>
           <p className="text-xs text-gray-500">
             {new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' })}
           </p>
@@ -133,12 +136,12 @@ export default function DashboardPage({ goals }) {
 
         {/* Food List */}
         <div className="mb-4">
-          <h3 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">Eaten today</h3>
+          <h3 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">{t('dash.eaten')}</h3>
           {entries.length === 0 ? (
             <div className="text-center py-10 text-gray-600 text-sm">
               <p className="text-3xl mb-2">🥗</p>
-              <p>No food logged yet.</p>
-              <p>Tap <strong>+</strong> to add your first entry.</p>
+              <p>{t('dash.empty.1')}</p>
+              <p>{t('dash.empty.2').replace('+', '➕')}</p>
             </div>
           ) : (
             <div className="space-y-2">
