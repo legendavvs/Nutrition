@@ -56,7 +56,7 @@ app.get('/api/search', async (req, res) => {
   const { q } = req.query
   if (!q) return res.status(400).json({ error: 'Query required' })
   try {
-    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=*${encodeURIComponent(q)}*&search_simple=1&action=process&json=1&page_size=40`
+    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}*&search_simple=1&action=process&json=1&page_size=40`
     const { data } = await axios.get(url, { headers: { 'User-Agent': 'NutriScan/1.0' }, timeout: 10000 })
     
     if (!data.products) return res.json({ products: [] })

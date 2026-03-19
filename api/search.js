@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const searchUrl = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=*${encodeURIComponent(q)}*&search_simple=1&action=process&json=1&page_size=30`
+    const searchUrl = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}*&search_simple=1&action=process&json=1&page_size=30`
     const response = await fetch(
       searchUrl,
       {
